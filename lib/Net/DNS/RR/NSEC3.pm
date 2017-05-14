@@ -37,14 +37,11 @@ my %digest = (
 		'SHA-1' => 1,					# RFC3658
 		);
 
-	my @digestbyalias = ( 'SHA' => 1 );
-
+	my @digestbyalias = ( 'SHA'  => 1,
+                              'SHA1' => 1 ); 			# internal key
 	my %digestbyval = reverse @digestbyname;
-
-	my @digestbynum = map { ( $_, 0 + $_ ) } keys %digestbyval;    # accept algorithm number
-
-	my %digestbyname = map { s /[^A-Za-z0-9]//g; $_ } @digestbyalias, @digestbyname, @digestbynum;
-
+	my @digestbynum = map { ( "$_", 0 + $_ ) } keys %digestbyval;    # accept algorithm number
+	my %digestbyname = (@digestbyalias, @digestbyname, @digestbynum);
 
 	sub _digestbyname {
 		my $name = shift;

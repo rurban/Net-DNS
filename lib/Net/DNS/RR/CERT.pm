@@ -67,17 +67,7 @@ my %certtype = (
 		);
 
 	my %algbyval = reverse @algbyname;
-
-	my $map = sub {
-		my $arg = shift;
-		unless ( $arg =~ /^\d/ ) {
-			$arg =~ s/[^A-Za-z0-9]//g;		# synthetic key
-			return uc $arg;
-		}
-		my @map = ( $arg, "$arg" => $arg );		# also accept number
-	};
-
-	my %algbyname = map &$map($_), @algbyname;
+	my %algbyname = Net::DNS::RR::_map_name(@algbyname);
 
 	sub _algbyname {
 		my $arg = shift;

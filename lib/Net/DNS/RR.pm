@@ -472,7 +472,9 @@ Resource record time to live in seconds.
 # published API.  These are required for parsing BIND zone files but
 # should not be used in other contexts.
 my %unit = ( W => 604800, D => 86400, H => 3600, M => 60, S => 1 );
-%unit = ( %unit, map /\D/ ? lc($_) : $_, %unit );
+for my $k (keys %unit) {
+	$unit{lc($k)} = $unit{$k};
+}
 
 sub ttl {
 	my ( $self, $time ) = @_;
@@ -742,6 +744,31 @@ sub _wrap {
 	return @line;
 }
 
+sub _map_name {
+	my @args = @_;
+	my %r;
+	while (my($arg, $val) = splice @args, 0, 2) {
+		unless ( $arg =~ /^\d/ ) {
+			$arg =~ s/[^A-Za-z0-9]//g;      # synthetic key
+			$r{uc $arg} = $val;
+                }
+        }
+        %r
+}
+
+sub _map_allow_num {
+	my @args = @_;
+	my %r;
+	while (my($arg, $val) = splice @args, 0, 2) {
+		unless ( $arg =~ /^\d/ ) {
+			$arg =~ s/[^A-Za-z0-9]//g;      # synthetic key
+			$r{uc $arg} = $val;
+                } else {
+			$r{"$arg"} = $val;		# also accept number
+                }
+        }
+        %r
+}
 
 ################################################################################
 

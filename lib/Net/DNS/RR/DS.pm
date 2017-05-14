@@ -64,17 +64,7 @@ my %digest = (
 		);
 
 	my %algbyval = reverse @algbyname;
-
-	my $map = sub {
-		my $arg = shift;
-		unless ( $arg =~ /^\d/ ) {
-			$arg =~ s/[^A-Za-z0-9]//g;		# synthetic key
-			return uc $arg;
-		}
-		my @map = ( $arg, "$arg" => $arg );		# also accept number
-	};
-
-	my %algbyname = map &$map($_), @algbyname;
+	my %algbyname = @algbyname;				# already uppercase
 
 	sub _algbyname {
 		my $arg = shift;
@@ -108,18 +98,7 @@ my %digest = (
 		);
 
 	my %digestbyval = reverse @digestbyname;
-
-	my $map = sub {
-		my $arg = shift;
-		unless ( $arg =~ /^\d/ ) {
-			$arg =~ s/[^A-Za-z0-9]//g;		# synthetic key
-			return uc $arg;
-		}
-		my @map = ( $arg, "$arg" => $arg );		# also accept number
-	};
-
-	my %digestbyname = map &$map($_), @digestbyalias, @digestbyname;
-
+	my %digestbyname = Net::DNS::RR::_map_name(@digestbyalias, @digestbyname);
 
 	sub _digestbyname {
 		my $arg = shift;

@@ -50,16 +50,10 @@ use constant TSIG => typebyname qw(TSIG);
 
 
 	my %algbyval = reverse @algbyname;
-
-	my $map = sub {
-		my $arg = shift;
-		return $arg if $arg =~ /^\d/;
-		$arg =~ s/[^A-Za-z0-9]//g;			# strip non-alphanumerics
-		uc($arg);
-	};
-
-	my @pairedval = sort ( 1 .. 254, 1 .. 254 );		# also accept number
-	my %algbyname = map &$map($_), @algbyalias, @algbyname, @pairedval;
+	my %algbyname = Net::DNS::RR::_map_name(@algbyalias, @algbyname);
+        for (1..254) {
+		$algbyname{"$_"} = $_;				# also accept numbers
+	}
 
 	sub _algbyname {
 		my $key = uc shift;				# synthetic key
@@ -535,7 +529,7 @@ sub vrfyerrstr {
 		my $private = shift;	# closure keeps private key private
 		$keyref->{key} = sub {
 			my $function = $keyref->{digest};
-			return &$function( $private, @_ );
+			return &$function( $private, @_ ) if $function;
 		};
 		return undef;
 	}
@@ -549,7 +543,7 @@ sub vrfyerrstr {
 		my $keyref = $keytable{$owner};
 		$keyref->{digest} = $self->sig_function unless $keyref->{digest};
 		my $function = $keyref->{key};
-		&$function(@_);
+		&$function(@_) if $function;
 	}
 }
 
